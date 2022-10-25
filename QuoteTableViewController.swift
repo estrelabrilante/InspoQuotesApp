@@ -110,13 +110,21 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
         SKPaymentQueue.default().finishTransaction(transaction)
         
     }
+            else if transaction.transactionState == .restored{
+                showPremiumQuotes()
+                print("Transaction restored")
+                navigationItem.setRightBarButton(nil, animated: true)
+                SKPaymentQueue.default().finishTransaction(transaction)
+            }
             }
         }
+    
     //giving access to purchased content after sucessful transaction
     func showPremiumQuotes(){
-        quotesToShow.append(contentsOf: premiumQuotes)
+        UserDefaults.standard.set(true, forKey: "productID");        quotesToShow.append(contentsOf: premiumQuotes)
         tableView.reloadData()
     }
+    
     //if the user already purchased app
     func isPurchased() -> Bool{
         let purchaseStatus = UserDefaults.standard.bool(forKey: productID)
@@ -131,6 +139,6 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
     }
         
 @IBAction func restorePressed(_ sender: UIBarButtonItem) {
-            
+    SKPaymentQueue.default().restoreCompletedTransactions()
         }
     }
