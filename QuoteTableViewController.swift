@@ -89,10 +89,17 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
         for transaction in transactions {
             if transaction.transactionState == .purchased{
                 print("transaction successful")
+                SKPaymentQueue.default().finishTransaction(transaction)
             }
-    else if            transaction.transactionState == .failed{
+    else if transaction.transactionState == .failed{
                     print("transaction failed")
-                }
+        if let error = transaction.error{
+            let errorDescription = error.localizedDescription
+            print("Transaction failed,\(errorDescription)")
+        }
+        SKPaymentQueue.default().finishTransaction(transaction)
+        
+    }
             }
         }
     
