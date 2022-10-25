@@ -36,19 +36,27 @@ class QuoteTableViewController: UITableViewController,SKPaymentTransactionObserv
     override func viewDidLoad() {
         super.viewDidLoad()
         SKPaymentQueue.default().add(self)
+        //already purchased user can use all the features of the app
+        if isPurchased(){
+            showPremiumQuotes()
+        }
     }
     
     // MARK: - Table view data source
     
 override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return quotesToShow.count + 1
+    if isPurchased(){return quotesToShow.count}
+    else{
+        return quotesToShow.count + 1}
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "QuoteCell", for: indexPath)
         if indexPath.row < quotesToShow.count{
             cell.textLabel?.text = quotesToShow[indexPath.row]
             cell.textLabel?.numberOfLines = 0
+            cell.textLabel?.textColor = .black
+            cell.accessoryType = .none
         }
         else{
             cell.textLabel?.text = "Get More Quotes"
@@ -89,6 +97,8 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
         for transaction in transactions {
             if transaction.transactionState == .purchased{
                 print("transaction successful")
+                showPremiumQuotes()
+                UserDefaults.standard.set(true, forKey: "productID")
                 SKPaymentQueue.default().finishTransaction(transaction)
             }
     else if transaction.transactionState == .failed{
@@ -102,7 +112,23 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
     }
             }
         }
-    
+    //giving access to purchased content after sucessful transaction
+    func showPremiumQuotes(){
+        quotesToShow.append(contentsOf: premiumQuotes)
+        tableView.reloadData()
+    }
+    //if the user already purchased app
+    func isPurchased() -> Bool{
+        let purchaseStatus = UserDefaults.standard.bool(forKey: productID)
+        if purchaseStatus{
+            print("purchased")
+            return true
+        }
+        else{
+            print("never purchased")
+            return false
+        }
+    }
         
 @IBAction func restorePressed(_ sender: UIBarButtonItem) {
             
